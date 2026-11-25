@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Связные списки — курсовая № 21</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='playlist_20261121_2') }}">
+</head>
+<body>
+    <main class="page">
+        <header>
+            <p class="eyebrow">Курсовая работа № 21</p>
+            <h1>Визуализация связных списков</h1>
+        </header>
+
+        <div class="notification-area" aria-live="polite">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                    <p class="message {{ category }}">{{ message }}</p>
+                {% endfor %}
+            {% endwith %}
+        </div>
+
+        <p class="page-nav"><a href="{{ url_for('playlist_page') }}">Практический пример: музыкальный плейлист</a></p>
+
+        <section class="panel">
+            <h2>1. Выбор структуры данных</h2>
+            <form method="post" class="line-form">
+                <select name="kind" aria-label="Вид списка">
+                    {% for key, info in kinds.items() %}
+                        <option value="{{ key }}" {% if key == kind %}selected{% endif %}>
+                            {{ info[0] }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <button name="action" value="choose_type">Выбрать</button>
+            </form>
+        </section>
+
+        <section class="panel">
+<!--            <div class="heading-row">-->
+<!--                <h2>2. Состояние списка</h2>-->
+<!--                <span class="status">{{ 'Связи корректны' if valid else 'Ошибка связей' }}</span>-->
+<!--            </div>-->
+            <p class="muted">Размер: {{ values|length }} </p>
+            <div class="list">
+                {% for value in values %}
+                    <div class="node {% if loop.first %}head{% endif %} {% if loop.last %}tail{% endif %} {% if loop.index0 == cursor_index %}active{% endif %}">
+                        <div class="node-role">
+                            {% if loop.first %}<span>HEAD</span>{% endif %}
+                            {% if loop.index0 == cursor_index %}<span>CURSOR</span>{% endif %}
+                            {% if loop.last %}<span>TAIL</span>{% endif %}
+                        </div>
+                        <strong>{{ value }}</strong>
+                        <small>индекс {{ loop.index0 }}</small>
+                    </div>
+                    {% if not loop.last %}
+                        <div class="arrows">
+                            <span>→</span>
+                            {% if doubly %}<span>←</span>{% endif %}
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <p class="muted">Список пуст. Добавьте элемент.</p>
+                {% endfor %}
+            </div>
+            {% if circular and values %}
+                <p class="ring">Кольцевые связи: TAIL.next → HEAD, HEAD.prev → TAIL</p>
+            {% endif %}
+            <div class="legend">
+                <span><i class="mark mark-head"></i> начало (HEAD)</span>
+                <span><i class="mark mark-active"></i> курсор</span>
+                <span><i class="mark mark-tail"></i> конец (TAIL)</span>
+            </div>
+        </section>
+
+        <div class="columns">
+            <section class="panel">
+                <h2>3. Добавление</h2>
+                <form method="post" class="form-stack">
+                    <label>Значение
+                        <input type="number" name="value" required placeholder="Например, 42">
+                    </label>
+                    <label>Индекс для вставки
+                        <input type="number" name="index" min="0" placeholder="Например, 1">
+                    </label>
+                    <div class="buttons">
+                        <button name="action" value="add_front">В начало</button>
+                        <button name="action" value="add_back">В конец</button>
+                        <button name="action" value="add_at">По индексу</button>
+                        <button name="action" value="add_after_cursor">После курсора</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="panel">
+                <h2>4. Удаление</h2>
+                <form method="post" class="form-stack">
+                    <label>Индекс для удаления
+                        <input type="number" name="index" min="0" placeholder="Например, 1">
+                    </label>
+                    <div class="buttons">
+                        <button name="action" value="remove_front">Первый</button>
+                        <button name="action" value="remove_back">Последний</button>
+                        <button name="action" value="remove_at">По индексу</button>
+                        <button name="action" value="remove_cursor">Курсор</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+
+        <div class="columns controls-columns">
+            <div class="left-controls">
+            <section class="panel" id="cursor-controls">
+                <h2>5. Перемещение курсора</h2>
+                <form method="post" action="{{ url_for('home') }}#cursor-controls" class="buttons">
+                    <button name="action" value="previous">← Назад</button>
+                    <button name="action" value="next">Вперёд →</button>
+                </form>
+                <p class="muted">Обратный переход доступен только в двусвязных списках.</p>
+            </section>
+
+            <section class="panel">
+                <h2>7. Управление</h2>
+                <form method="post" class="buttons">
+                    <button name="action" value="example">Пример 10, 20, 30</button>
+                    <button class="danger" name="action" value="clear">Очистить список</button>
+                </form>
+            </section>
+            </div>
+
+            <section class="panel">
+                <h2>6. Кольцевой сдвиг</h2>
+                <p class="muted">Сдвиг влево: первый элемент переходит в конец.<br>
+                   Сдвиг вправо: последний элемент переходит в начало.</p>
+                {% if shift_remaining is none %}
+                    <form method="post" class="form-stack">
+                        <label>Количество шагов
+                            <input type="number" name="steps" min="0" value="1" required>
+                        </label>
+                        <label>Направление
+                            <select name="direction">
+                                <option value="left">Влево — первый элемент в конец</option>
+                                <option value="right">Вправо — последний элемент в начало</option>
+                            </select>
+                        </label>
+                        <div class="buttons">
+                            <button name="action" value="rotate">Сдвинуть сразу</button>
+                            <button name="action" value="shift_start">Пошаговый сдвиг</button>
+                        </div>
+                    </form>
+                {% else %}
+                    <p class="step-status">Направление: {{ 'влево' if shift_direction == 'left' else 'вправо' }}.
+                        Выполнено {{ shift_total - shift_remaining }} из {{ shift_total }} шагов.</p>
+                    <form method="post" class="buttons">
+                        <button name="action" value="shift_next">Следующий шаг</button>
+                        <button name="action" value="shift_cancel">Завершить режим</button>
+                    </form>
+                {% endif %}
+                <p class="muted">Работает только для кольцевого списка.</p>
+            </section>
+        </div>
+
+    </main>
+</body>
+</html>

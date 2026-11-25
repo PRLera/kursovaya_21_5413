@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Музыкальный плейлист — курсовая № 21</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='playlist_20261121_2') }}">
+</head>
+<body>
+<main class="page" id="playlist-view">
+    <header>
+        <p class="eyebrow">Курсовая работа № 21 · Практический пример</p>
+        <h1>Музыкальный плейлист</h1>
+    </header>
+    <p class="page-nav"><a href="{{ url_for('home') }}">← К основной визуализации</a></p>
+
+    <div class="notification-area" aria-live="polite">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <p class="message {{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endwith %}
+    </div>
+
+    <section class="panel">
+        <h2>1. Структура данных</h2>
+        <p class="playlist-type">Кольцевой двусвязный список</p>
+    </section>
+
+    <section class="panel music-panel" id="music-list">
+        <div class="heading-row">
+            <h2>2. Плейлист</h2>
+            <span class="status">Песен: {{ playlist.count }}</span>
+        </div>
+
+        {% if playlist.titles %}
+            <div class="music-tracks">
+                {% for song in playlist.titles %}
+                    <div class="music-track {% if loop.index0 == playlist.cursor_index %}music-selected{% endif %}">
+                        <span class="music-number">{{ loop.index }}</span>
+                        <span class="music-title">{{ song }}</span>
+                        {% if loop.index0 == playlist.cursor_index %}
+                            <span class="music-current">Текущая</span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="music-summary">
+                <div>
+                    <span class="music-caption">Сейчас играет:</span>
+                    <div class="music-song-name">{{ playlist.current }}</div>
+                    <p class="music-position">Курсор: узел {{ playlist.cursor_index + 1 }} из {{ playlist.count }}</p>
+        {% else %}
+            <p class="muted">Плейлист пуст. Добавьте первую композицию.</p>
+        {% endif %}
+
+        <form method="post" action="{{ url_for('playlist_page') }}#music-list" class="music-navigation">
+            <button name="action" value="playlist_previous" {% if not playlist.count %}disabled{% endif %}>← Предыдущая</button>
+            <button name="action" value="playlist_next" {% if not playlist.count %}disabled{% endif %}>Следующая →</button>
+        </form>
+    </section>
+
+    <div class="columns playlist-controls">
+        <section class="panel">
+            <h2>3. Добавление песни</h2>
+            <form method="post" action="{{ url_for('playlist_page') }}#music-list" class="form-stack">
+                <label>Название песни
+                    <input type="text" name="title" maxlength="80" placeholder="Например, Песня 4" required>
+                </label>
+                <div class="buttons">
+                    <button name="action" value="playlist_add">Добавить в начало</button>
+                </div>
+            </form>
+        </section>
+        <section class="panel">
+            <h2>4. Удаление песни</h2>
+            <p class="muted">Удаляется только песня, на которую указывает курсор.</p>
+            <form method="post" action="{{ url_for('playlist_page') }}#music-list" class="buttons">
+                <button name="action" value="playlist_remove" class="danger" {% if not playlist.count %}disabled{% endif %}>Удалить текущую</button>
+            </form>
+        </section>
+    </div>
+
+    <div class="columns playlist-controls">
+        <section class="panel">
+            <h2>5. Управление</h2>
+            <form method="post" action="{{ url_for('playlist_page') }}#music-list" class="buttons">
+                <button name="action" value="playlist_reset">Пример: 3 песни</button>
+                <button name="action" value="playlist_clear" class="danger">Очистить плейлист</button>
+            </form>
+        </section>
+    </div>
+</main>
+</body>
+</html>

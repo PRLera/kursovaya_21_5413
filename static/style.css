@@ -1,0 +1,217 @@
+/* Тёплая оливково-охристая палитра. Оформление без JavaScript. */
+:root {
+    --background: #eadcc4;     /* общий фон страницы */
+    --panel: #f7f3e8;          /* блоки интерфейса */
+    --text: #35352b;           /* основной текст */
+    --muted: #665f4e;          /* дополнительные подписи */
+    --line: #ada589;           /* рамки */
+    --head: #806a42;          /* начало списка */
+    --cursor: #bc763a;        /* курсор */
+    --tail: #536c50;          /* конец списка */
+    --head-bg: #e4d6bb;
+    --tail-bg: #d8dfcf;
+    --button: #d7bd86;        /* тёплая охра */
+    --button-hover: #c8a66c;
+    --button-border: #9f8255;
+    --input: #fffdf7;
+    --success-bg: #e0e8d5;
+    --success-line: #84946e;
+    --success-text: #364932;
+    --error-bg: #f2ddd1;
+    --error-line: #b47e66;
+    --error-text: #864a34;
+    --step-bg: #e9e0c8;
+    --danger-bg: #e4c6b5;
+    --danger-border: #a77863;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: auto; }
+body {
+    margin: 0;
+    background: var(--background);
+    color: var(--text);
+    font: 14px/1.5 Arial, sans-serif;
+}
+.page { max-width: 1050px; margin: 24px auto; padding: 0 18px 30px; }
+header { margin-bottom: 12px; }
+h1 { font-size: 25px; margin: 0 0 5px; color: var(--text); }
+h2 { font-size: 17px; margin: 0 0 14px; color: var(--text); }
+.eyebrow { margin: 0 0 6px; color: #65543c; font-size: 13px; }
+.subtitle, .muted, .footnote, .ring { color: var(--muted); }
+.subtitle { margin: 0; font-size: 13px; }
+.panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 18px;
+    margin-top: 14px;
+}
+.columns { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.columns .panel { margin-top: 14px; }
+.heading-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.status { color: var(--muted); font-size: 13px; }
+.line-form, .buttons { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; }
+.form-stack { display: grid; gap: 10px; }
+label { display: grid; gap: 4px; color: var(--text); font-size: 13px; }
+input, select {
+    background: var(--input);
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 7px 9px;
+    min-width: 100px;
+    font: inherit;
+}
+input:focus, select:focus { outline: 2px solid var(--cursor); outline-offset: 1px; }
+button {
+    color: #302f24;
+    background: var(--button);
+    border: 1px solid var(--button-border);
+    border-radius: 2px;
+    padding: 7px 12px;
+    cursor: pointer;
+    font: inherit;
+}
+button:hover { background: var(--button-hover); }
+button:focus-visible { outline: 2px solid var(--cursor); outline-offset: 2px; }
+button.danger { background: var(--danger-bg); border-color: var(--danger-border); }
+/* Узлы как в первоначальной схеме: подпись, число, индекс.
+   Цветных полосок над HEAD/CURSOR/TAIL больше нет. */
+.list { display: flex; flex-wrap: wrap; align-items: center; min-height: 112px; padding: 12px 0; gap: 6px; }
+.node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 94px;
+    min-height: 92px;
+    padding: 9px;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    background: var(--panel);
+}
+.node-role {
+    min-height: 14px;
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    color: #65523d;
+    font-size: 10px;
+    line-height: 14px;
+    white-space: nowrap;
+}
+.node-role:empty { visibility: hidden; }
+.node strong { font-size: 20px; line-height: 1.3; margin: 3px 0 5px; font-weight: 600; }
+.node small { color: var(--muted); font-size: 11px; }
+.node.head { background: var(--head-bg); border-color: var(--head); }
+.node.tail { background: var(--tail-bg); border-color: var(--tail); }
+.node.active { outline: 2px solid var(--cursor); outline-offset: 2px; }
+.node.head.tail { background: linear-gradient(90deg, var(--head-bg) 50%, var(--tail-bg) 50%); }
+.arrows { display: grid; justify-items: center; font-size: 18px; line-height: 15px; color: var(--head); }
+.ring { font-size: 12px; margin: 0 0 12px; }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; color: var(--muted); font-size: 12px; }
+.legend span { display: flex; align-items: center; gap: 6px; }
+.mark { display: inline-block; width: 11px; height: 11px; border-radius: 1px; }
+.mark-head { background: var(--head); }
+.mark-active { background: var(--cursor); }
+.mark-tail { background: var(--tail); }
+.notification-area { min-height: 42px; display: flex; align-items: stretch; }
+.message { width: 100%; padding: 9px 12px; border: 1px solid var(--line); margin: 2px 0 4px; }
+.message.success { background: var(--success-bg); border-color: var(--success-line); color: var(--success-text); }
+.message.error { background: var(--error-bg); border-color: var(--error-line); color: var(--error-text); }
+.step-status { background: var(--step-bg); border: 1px solid var(--line); padding: 8px; }
+.left-controls { display: flex; flex-direction: column; gap: 14px; }
+.left-controls .panel { margin-top: 0; }
+.controls-columns > .panel { margin-top: 0; }
+.controls-columns { margin-top: 14px; align-items: stretch; }
+#cursor-controls { scroll-margin-top: 230px; }
+@media (max-width: 720px) {
+    .columns { grid-template-columns: 1fr; gap: 0; }
+    .controls-columns { gap: 14px; }
+    .heading-row { display: block; }
+    #cursor-controls { scroll-margin-top: 135px; }
+}
+
+/* Отдельная страница практического примера плейлиста. */
+.page-nav { margin: 12px 0; }
+.page-nav a { color: #72502c; text-decoration: underline; }
+.page-nav a:hover { color: #4b3b23; }
+.playlist-list { gap: 9px; }
+.playlist-node { min-width: 140px; }
+.playlist-node strong { font-size: 16px; }
+.playlist-node.active { background: #ebdcc0; }
+.playlist-node .node-role { color: var(--muted); }
+#playlist-view { scroll-margin-top: 12px; }
+
+
+/* Плейлист: строки композиций, как в обычном музыкальном приложении. */
+.playlist-type { font-weight: bold; margin: 4px 0; color: var(--tail); }
+.playlist-layout { display: grid; grid-template-columns: 1.45fr 1fr; gap: 18px; align-items: start; }
+.playlist-tracks { border: 1px solid var(--line); background: var(--input); }
+.playlist-track {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 14px; min-height: 50px;
+    border-bottom: 1px solid #d4c8af;
+}
+.playlist-track:last-child { border-bottom: 0; }
+.track-number { width: 22px; text-align: center; color: var(--muted); flex-shrink: 0; }
+.track-title { flex: 1; min-width: 0; overflow-wrap: anywhere; font-weight: 500; }
+.playlist-track.playing { background: #e9dec3; border-left: 4px solid var(--cursor); padding-left: 10px; }
+.playlist-track.playing .track-title { font-weight: bold; }
+.track-now { color: #774c26; font-size: 12px; white-space: nowrap; }
+.playlist-info { border: 1px solid var(--line); padding: 14px; background: #f1e9d8; }
+.playlist-info p { margin: 0 0 10px; }
+.playlist-info .ring { margin-bottom: 0; }
+.playlist-current { font-size: 20px; font-weight: bold; overflow-wrap: anywhere; color: #59442d; }
+.playlist-nav { margin-top: 15px; }
+.playlist-nav form { display: flex; flex-wrap: wrap; gap: 9px; }
+button:disabled { opacity: 0.5; cursor: default; }
+.playlist-controls { align-items: stretch; }
+.playlist-controls .panel { height: 100%; }
+@media (max-width: 720px) { .playlist-layout { grid-template-columns: 1fr; } }
+
+
+/* Плейлист: список отдельных строк, текущая песня выделена. */
+.music-panel { padding: 20px; }
+.music-panel .heading-row { align-items: center; margin-bottom: 16px; }
+.music-panel .heading-row h2 { margin-bottom: 0; }
+.music-tracks { border: 1px solid #b9a98a; border-radius: 3px; overflow: hidden; background: #fffaf0; }
+.music-track {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-height: 57px;
+    padding: 11px 16px;
+    border-bottom: 1px solid #ddd1b9;
+    background: #fffaf0;
+}
+.music-track:last-child { border-bottom: 0; }
+.music-track.music-selected {
+    background: #e9dcc0;
+    border-left: 4px solid #a46a37;
+    padding-left: 12px;
+}
+.music-number { width: 24px; flex: 0 0 24px; color: #72654f; text-align: center; }
+.music-title { font-size: 15px; font-weight: 500; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.music-selected .music-title { color: #4a3829; font-weight: 700; }
+.music-current {
+    flex-shrink: 0;
+    font-size: 12px;
+    color: #764d2e;
+    background: #f6ebd8;
+    border: 1px solid #c9a67b;
+    border-radius: 2px;
+    padding: 3px 8px;
+}
+.music-summary { display: grid; grid-template-columns: 1.2fr 1fr; gap: 18px; margin-top: 14px; }
+.music-caption { color: #6c6150; font-size: 13px; }
+.music-song-name { font-weight: 700; font-size: 19px; margin-top: 3px; overflow-wrap: anywhere; }
+.music-position { color: #665f4e; font-size: 13px; margin: 7px 0 0; }
+.music-cycle { color: #665f4e; font-size: 13px; align-self: center; margin: 0; }
+.music-navigation { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 18px; }
+#music-list { scroll-margin-top: 20px; }
+@media (max-width: 720px) {
+    .music-summary { grid-template-columns: 1fr; gap: 12px; }
+    .music-track { gap: 8px; padding: 10px; }
+    .music-track.music-selected { padding-left: 6px; }
+}
